@@ -1,0 +1,94 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - scripts/dotnet/*
+
+pool:
+  # name : Default
+  vmImage: ubuntu-latest
+  # vmImage: windows-latest
+
+  
+variables:
+  projectLocation : './scripts/dotnet/webapp'
+  acrName : 'maaletriveniacr243142'
+  imageName : 'webapp'
+  tag : 'v1.0.$(Build.BuildId)'
+  csproj : '**/*.csproj'
+
+
+ 
+stages:
+  - stage: DockerBuild
+    jobs:
+      - job: BuildAndPushDockerImage
+        displayName: Building Docker File and Pushing to ACR
+        
+        steps:
+          - task: AzureKeyVault@2
+            inputs:
+              azureSubscription: 'AzureTraining (606e824b-aaf7-4b4e-9057-b459f6a4436d)'
+              KeyVaultName: 'trivenicapstone'
+              SecretsFilter: 'password'
+              RunAsPreJob: false
+
+          - script: |
+              az login --service-principal -u $(clientId) -p $(password) --tenant $(tenantId)
+              az acr login --name $(acrName)
+              docker build -t $(acrName).azurecr.io/$(imageName):$(tag) $(projectLocation)
+              docker push $(acrName).azurecr.io/$(imageName):$(tag)
+            displayName: Docker Build and Push Image
+   
+
+  - stage: SonarQube 
+    pool: 
+      vmImage: windows-latest
+    jobs:
+      - job: SonarQubeAnalysis
+        displayName: SonarQube Analysis
+        
+        steps:
+
+        - task: SonarCloudPrepare@3
+          inputs:
+            SonarQube: 'sonar cloud connection'
+            organization: 'trivenischandramaale'
+            scannerMode: 'dotnet'
+            projectKey: 'trivenischandramaale_capstone'
+            projectName: 'capstone'
+
+        - task: NuGetCommand@2
+          inputs:
+            command: 'restore'
+            restoreSolution: $(csproj)
+            feedsToUse: 'select'
+
+        - task: MSBuild@1
+          inputs:
+            solution: $(csproj)
+
+        - task: VSTest@3
+          inputs:
+            testSelector: 'testAssemblies'
+            testAssemblyVer2: |
+              **\bin\**\*test.dll
+              **\bin\**\*tests.dll
+            searchFolder: '$(System.DefaultWorkingDirectory)'
+            codeCoverageEnabled: true
+          
+
+        - task: SonarCloudAnalyze@3
+          inputs:
+            jdkversion: 'JAVA_HOME'
+
+        - task: SonarCloudPublish@3
+          inputs:
+            pollingTimeoutSec: '300'

@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "name": {
+        "value": "mywebjdhcdslk2131"
+      },
+      "location": {
+        "value": "East US"
+      },
+      "hostingPlanName": {
+        "value": "neplan2131"
+      },
+      "serverFarmResourceGroup": {
+        "value": "trivenirg"
+      },
+      "sku": {
+        "value": "Free"
+      },
+      "skuCode": {
+        "value": "F1"
+      },
+      "linuxFxVersion": {
+        "value": "DOCKER|maaletriveni.azurecr.io/webapp:latest"
+      },
+      "dockerRegistryUrl": {
+        "value": "https://maaletriveni.azurecr.io"
+      },
+      "dockerRegistryUsername": {
+        "value": "maaletriveni"
+      },
+      "dockerRegistryPassword": {
+        "value": ""
+      },
+      "dockerRegistryStartupCommand": {
+        "value": ""
+      },
+      "acrUserIdentityName": {
+        "value": "ua-id-82d23"
+      }
+    }
+  }
+  

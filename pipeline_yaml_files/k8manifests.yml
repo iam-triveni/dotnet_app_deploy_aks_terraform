@@ -1,0 +1,26 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - scripts/k8manifests/*
+
+
+pool:
+  name: Default
+  
+
+stages:
+  - stage: k8manifests
+    displayName: k8manifests
+    jobs:
+    - job: k8manifests
+      displayName: k8manifests
+      steps:
+        - task: PublishBuildArtifacts@1
+          displayName: Publishing manifest files for k8s cluster
+          inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/scripts/k8manifests' 
+              ArtifactName: 'k8manifests_artifact'
+              publishLocation: 'Container'

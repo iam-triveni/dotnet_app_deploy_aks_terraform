@@ -1,0 +1,26 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - scripts/armtemplates/*
+
+
+pool:
+  name: Default
+  
+
+stages: 
+  - stage: ARMTemplate
+    displayName: ARMTemplate Provision For app service containers
+    jobs:
+    - job: ARMTemplateDeploy
+      displayName: ARMTemplateDeploy
+      steps:
+        - task: PublishBuildArtifacts@1
+          displayName: Publishing App Service For container
+          inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/scripts/armtemplates' 
+              ArtifactName: 'armApp_artifact'
+              publishLocation: 'Container'

@@ -1,0 +1,26 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - scripts/terraform/*
+
+pool:
+  name: Default
+  
+
+stages:
+  - stage: Terraform
+    displayName: AKS cluster deploy
+    jobs:
+      - job: TerraformDeploy
+        displayName: Deploying AKS Cluster
+        steps:
+          - task: PublishBuildArtifacts@1
+            displayName: Publishing AKS Artifact
+            inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/scripts/terraform/aks' 
+              ArtifactName: 'aks_artifact'
+              publishLocation: 'Container'
+            

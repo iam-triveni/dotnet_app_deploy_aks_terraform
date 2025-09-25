@@ -1,0 +1,24 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - scripts/bicep/acr/*
+
+
+pool:
+  name: Default
+  
+
+stages:       
+  - stage: BicepDeployement
+    jobs:
+    - job: ACRCreation
+      steps:
+        - task: PublishBuildArtifacts@1
+          displayName: Publishing ACR
+          inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/scripts/bicep/acr' 
+              ArtifactName: 'acr_artifact'
+              publishLocation: 'Container'
